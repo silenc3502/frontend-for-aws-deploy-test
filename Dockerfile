@@ -1,7 +1,6 @@
-FROM node:18.14.1
+FROM node:18.14.1 as build-stage
 #FROM node:lts-alpine
 
-RUN npm i -g http-server
 RUN mkdir -p /app
 WORKDIR /app
 ADD . /app/
@@ -12,4 +11,10 @@ RUN npm audit fix --force
 COPY . .
 RUN npm run build
 
-CMD ["http-server","dist"]
+# production stage
+FROM nginx:stable-alpine as production-stage
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+#COPY --from=build-stage /app/dist /usr/share/nginx/html
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
