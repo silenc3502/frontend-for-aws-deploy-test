@@ -56,7 +56,7 @@ jobs:
   deploy:
     needs: build
     name: Deploy
-    runs-on: self-hosted
+    runs-on: [ self-hosted, deploy-frontend ]
     steps:
       - name: Login to ghcr
         uses: docker/login-action@v1
@@ -65,8 +65,26 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GHCR_TOKEN }}
           
-      - name: gogosing
-        run: |
-          echo "docker pull ghcr.io/silenc3502/frontend-server:latest"
+      - name: Deploy to prod
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.HOST_PROD }}
+          username: ec2-user
+          key: ${{ secrets.PRIVATE_KEY }}
+          script_stop: true
+          script: |
+            pwd
+            ls -al
+            cd automation_front
+            pwd
+            
+            echo ${{ secrets.GHCR_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+            
+            docker pull ghcr.io/silenc3502/frontend-server:latest
+
+            docker image prune -f
+            docker logout
+            
+            docker-compose up -d
 
         
