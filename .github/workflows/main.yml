@@ -75,7 +75,7 @@ jobs:
           script: |
             pwd
             ls -al
-            cd actions-runner
+            cd automation_front
             pwd
             
             echo ${{ secrets.GHCR_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
