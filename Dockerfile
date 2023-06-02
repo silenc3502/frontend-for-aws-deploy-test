@@ -11,7 +11,6 @@ RUN npm run build
 # 베이스 이미지를 ARM64 아키텍처용 nginx 이미지로 설정합니다.
 FROM arm64v8/nginx:latest
 
-RUN mkdir /app
 WORKDIR /app
 
 # Vue.js 정적 파일을 컨테이너의 /app 디렉토리로 복사합니다.
