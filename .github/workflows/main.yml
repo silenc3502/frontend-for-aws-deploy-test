@@ -44,22 +44,14 @@ jobs:
           pwd
           echo "${{ secrets.CD_DEPLOY_CONFIG }}" > .env.production
           cat .env.production
-            
-      - name: Login to ghcr
-        uses: docker/login-action@v1
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GHCR_TOKEN }}
           
-      - name: Build and push
-        id: docker_build
-        uses: docker/build-push-action@v2
-        with:
-          builder: ${{ steps.buildx.outputs.name }}
-          push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ env.DOCKER_IMAGE }}:latest
-          platforms: linux/amd64,linux/arm64
+      ## docker build & push to production
+      - name: Docker build & push to prod
+        run: |
+          echo ${{ secrets.GHCR_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+          docker buildx create --name arm64builder --use
+          docker buildx build --platform linux/amd64,linux/arm64 -f Dockerfile -t ghcr.io/silenc3502/frontend-server:latest --push .
+          docker logout
           
   deploy:
     needs: build
