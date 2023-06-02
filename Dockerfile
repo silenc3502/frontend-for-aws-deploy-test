@@ -5,6 +5,13 @@ FROM arm64v8/nginx:latest
 RUN mkdir /app
 WORKDIR /app
 
+COPY package*.json ./
+RUN npm install
+
+COPY . .
+
+RUN npm run build
+
 # Vue.js 정적 파일을 컨테이너의 /app 디렉토리로 복사합니다.
 COPY dist/ /app
 
