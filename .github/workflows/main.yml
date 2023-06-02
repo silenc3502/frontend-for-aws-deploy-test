@@ -29,6 +29,12 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-buildx-
             
+      - name: Create .env.production for CD Deploy
+        run: |
+          pwd
+          echo "${{ secrets.CD_DEPLOY_CONFIG }}" > .env.production
+          cat .env.production
+            
       - name: Login to ghcr
         uses: docker/login-action@v1
         with:
