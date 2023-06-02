@@ -1,9 +1,7 @@
 FROM arm64v8/node:18 AS builder
 
 # Vue.js 애플리케이션을 정적 파일로 제공할 디렉토리를 생성합니다.
-RUN mkdir /app
 WORKDIR /app
-ADD . /app/
 
 COPY package*.json ./
 RUN npm install
