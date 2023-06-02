@@ -29,6 +29,16 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-buildx-
             
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 18
+          
+      - name: Install Dependencies
+        run: |
+          pwd
+          npm ci
+            
       - name: Create .env.production for CD Deploy
         run: |
           pwd
