@@ -22,6 +22,9 @@ jobs:
         with:
           arch: aarch64
           distro: ubuntu_latest
+          run: |
+            uname -a
+            echo ::set-output name=uname::$(uname -a)
         
       - name: Set up docker buildx
         id: buildx
