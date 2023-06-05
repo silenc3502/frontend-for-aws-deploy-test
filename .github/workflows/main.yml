@@ -47,14 +47,19 @@ jobs:
           echo "${{ secrets.CD_DEPLOY_CONFIG }}" > .env.production
           cat .env.production
           
-      ## docker build & push to production
-      - name: Docker build & push to prod
+      - name: Cache Docker Layers
+        uses: actions/cache@v2
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ env.VERSION }} # runner 설정에서 읽어들일거에요.
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+          
+      - name: Build and push Docker image
         run: |
           echo ${{ secrets.GHCR_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
           docker buildx create --name arm64builder --use
-          #docker buildx build --platform linux/amd64,linux/arm64 -f Dockerfile -t ghcr.io/silenc3502/frontend-server:latest --push .
-          docker buildx build --platform linux/arm64 -f Dockerfile -t ghcr.io/silenc3502/frontend-server:latest --push .
-
+          docker buildx build --platform linux/amd64,linux/arm64 -f Dockerfile -t ghcr.io/silenc3502/frontend-server:latest --push .
           docker logout
           
   deploy:
