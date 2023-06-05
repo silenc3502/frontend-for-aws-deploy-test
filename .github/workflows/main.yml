@@ -12,8 +12,7 @@ env:
 jobs:
   build:
     name: Build
-    #runs-on: ubuntu-latest
-    runs-on: buildjet-4vcpu-ubuntu-2204-arm
+    runs-on: ubuntu-latest
     steps:
       - name: Check out source code
         uses: actions/checkout@v2
@@ -58,13 +57,27 @@ jobs:
             ${{ runner.os }}-buildx-
           
       ## docker buildx --build-arg VUE_APP_BASE_URL=${{ secrets.CD_DEPLOY_CONFIG }}
-      - name: Build and push Docker image
-        run: |
-          echo ${{ secrets.GHCR_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-          docker buildx create --name arm64builder --use
+      #- name: Build and push Docker image
+      #  run: |
+      #    echo ${{ secrets.GHCR_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+      #    docker buildx create --name arm64builder --use
           #docker buildx build --platform linux/amd64,linux/arm64 --build-arg VUE_APP_BASE_URL=${{ secrets.CD_DEPLOY_CONFIG }} -f Dockerfile -t ghcr.io/silenc3502/frontend-server:latest --push .
-          docker buildx build --platform linux/arm64 --build-arg VUE_APP_BASE_URL=${{ secrets.CD_DEPLOY_CONFIG }} -f Dockerfile -t ghcr.io/silenc3502/frontend-server:latest --push .
-          docker logout
+      #    docker buildx build --platform linux/arm64 --build-arg VUE_APP_BASE_URL=${{ secrets.CD_DEPLOY_CONFIG }} -f Dockerfile -t ghcr.io/silenc3502/frontend-server:latest --push .
+      #    docker logout
+      - name: Set up Docker BuildKit
+        run: |
+          echo "DOCKER_BUILDKIT=1" >> $GITHUB_ENV
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          push: true
+          tags: ghcr.io/silenc3502/frontend-server:latest
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GHCR_TOKEN }}
+          platforms: linux/amd64,linux/arm64
           
   deploy:
     needs: build
