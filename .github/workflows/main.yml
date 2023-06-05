@@ -12,7 +12,8 @@ env:
 jobs:
   build:
     name: Build
-    runs-on: ubuntu-latest
+    #runs-on: ubuntu-latest
+    runs-on: actuated-aarch64
     steps:
       - name: Check out source code
         uses: actions/checkout@v2
@@ -61,7 +62,8 @@ jobs:
         run: |
           echo ${{ secrets.GHCR_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
           docker buildx create --name arm64builder --use
-          docker buildx build --platform linux/amd64,linux/arm64 --build-arg VUE_APP_BASE_URL=${{ secrets.CD_DEPLOY_CONFIG }} -f Dockerfile -t ghcr.io/silenc3502/frontend-server:latest --push .
+          #docker buildx build --platform linux/amd64,linux/arm64 --build-arg VUE_APP_BASE_URL=${{ secrets.CD_DEPLOY_CONFIG }} -f Dockerfile -t ghcr.io/silenc3502/frontend-server:latest --push .
+          docker buildx build --platform linux/arm64 --build-arg VUE_APP_BASE_URL=${{ secrets.CD_DEPLOY_CONFIG }} -f Dockerfile -t ghcr.io/silenc3502/frontend-server:latest --push .
           docker logout
           
   deploy:
