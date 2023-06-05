@@ -10,7 +10,8 @@ env:
   NAME: frontend-server
   
 jobs:
-  build:
+  #build:
+  start-kind:
     name: Build
     #runs-on: ubuntu-latest
     runs-on: actuated-aarch64
