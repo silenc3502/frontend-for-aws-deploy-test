@@ -10,11 +10,10 @@ env:
   NAME: frontend-server
   
 jobs:
-  #build:
-  start-kind:
+  build:
     name: Build
     #runs-on: ubuntu-latest
-    runs-on: actuated-aarch64
+    runs-on: buildjet-4vcpu-ubuntu-2204-arm
     steps:
       - name: Check out source code
         uses: actions/checkout@v2
