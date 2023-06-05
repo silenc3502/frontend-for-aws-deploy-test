@@ -3,6 +3,8 @@ services:
   frontend:
     image: ghcr.io/silenc3502/frontend-server:latest
     container_name: docker-frontend-deploy-server
+    ports:
+      - "80:80"
     networks:
       - app
 
