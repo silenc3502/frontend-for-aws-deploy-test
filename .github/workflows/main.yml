@@ -19,15 +19,6 @@ jobs:
     steps:
       - name: Check out source code
         uses: actions/checkout@v3
-      - uses: uraimo/run-on-arch-action@v2
-        name: Run commands
-        id: runcmd
-        with:
-          arch: aarch64
-          distro: ubuntu_latest
-          run: |
-            uname -a
-            echo ::set-output name=uname::$(uname -a)
         
       - name: Set up docker buildx
         id: buildx
@@ -67,35 +58,22 @@ jobs:
           key: ${{ runner.os }}-buildx-${{ env.VERSION }} # runner 설정에서 읽어들일거에요.
           restore-keys: |
             ${{ runner.os }}-buildx-
-          
-      ## docker buildx --build-arg VUE_APP_BASE_URL=${{ secrets.CD_DEPLOY_CONFIG }}
-      #- name: Build and push Docker image
-      #  run: |
-      #    echo ${{ secrets.GHCR_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-      #    docker buildx create --name arm64builder --use
-          #docker buildx build --platform linux/amd64,linux/arm64 --build-arg VUE_APP_BASE_URL=${{ secrets.CD_DEPLOY_CONFIG }} -f Dockerfile -t ghcr.io/silenc3502/frontend-server:latest --push .
-      #    docker buildx build --platform linux/arm64 --build-arg VUE_APP_BASE_URL=${{ secrets.CD_DEPLOY_CONFIG }} -f Dockerfile -t ghcr.io/silenc3502/frontend-server:latest --push .
-      #    docker logout
+            
       - name: Set up Docker BuildKit
         run: |
           echo "DOCKER_BUILDKIT=1" >> $GITHUB_ENV
-
-      - name: Login to GHCR
-        uses: docker/login-action@v1
+          
+      - uses: uraimo/run-on-arch-action@v2
+        name: Build and push Docker image on ARM64
+        id: runcmd
         with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GHCR_TOKEN }}
-
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v2
-        with:
-          context: .
-          file: ./Dockerfile
-          push: true
-          tags: ghcr.io/silenc3502/frontend-server:latest
-          #platforms: linux/amd64,linux/arm64
-          platforms: linux/arm64
+          arch: aarch64
+          distro: ubuntu_latest
+          run: |
+            echo ${{ secrets.GHCR_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+            docker buildx create --name arm64builder --use
+            docker buildx build --platform linux/arm64 -f Dockerfile -t ghcr.io/silenc3502/frontend-server:latest --push .
+            docker logout
           
   deploy:
     needs: build
