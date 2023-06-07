@@ -83,7 +83,7 @@ jobs:
           script_stop: true
           script: |
             cd fast-front-deploy
-            cp -r ~/actions-tmp-repo/dist/* ./
+            cp -r ~/actions-tmp-repo/dist/* ./html/
 
             docker image prune -f
             docker logout
