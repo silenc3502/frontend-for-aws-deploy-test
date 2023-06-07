@@ -58,6 +58,7 @@ jobs:
           pwd
           echo "${{ secrets.CD_DEPLOY_CONFIG }}" > .env.production
           cat .env.production
+          uname -a
           
       - name: Cache Docker Layers
         uses: actions/cache@v2
